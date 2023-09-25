@@ -1,0 +1,70 @@
+## @section MinIO&reg; parameters
+
+image:
+  registry: docker.io
+  repository: bitnami/minio
+  tag: 2023.9.16-debian-11-r0
+  pullPolicy: IfNotPresent
+
+clientImage:
+  registry: docker.io
+  repository: bitnami/minio-client
+  tag: 2023.9.13-debian-11-r0
+
+## @param mode MinIO&reg; server mode (`standalone` or `distributed`)
+mode: standalone
+auth:
+  rootUser: admin
+  rootPassword: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+## MinIO&reg; deployment parameters
+## Only when 'mode' is 'standalone'
+##
+deployment:
+  updateStrategy:
+    type: Recreate
+
+## @section Traffic exposure parameters
+
+## MinIO&reg; Service properties
+##
+service:
+  type: ClusterIP
+  ports:
+    api: 9000
+    console: 9001
+ 
+## Configure the ingress resource that allows you to access the
+ingress:
+  enabled: false
+  ingressClassName: "nginx"
+  hostname: minio.local
+  path: /
+  pathType: ImplementationSpecific
+  servicePort: minio-console
+
+apiIngress:
+  enabled: false
+  ingressClassName: "nginx"
+  hostname: minio.local
+  path: /
+  pathType: ImplementationSpecific
+  servicePort: minio-api
+  
+## @section Persistence parameters
+persistence:
+  enabled: true
+  existingClaim: "pvc-minio"
+
+# Init containers parameters:
+## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
+##
+volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes the owner and group of the persistent volume(s) mountpoint to `runAsUser:fsGroup`
+  ##
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/os-shell
+    tag: 11-debian-11-r69
+    pullPolicy: IfNotPresent
